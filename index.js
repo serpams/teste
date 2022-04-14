@@ -85,7 +85,7 @@ const BOTConnection = async () => {
   };
 };
 app.get('/connectbot', async (req, res) => {
-   BOTConnection();
+  await BOTConnection();
    res.send('BOT CONECTADO');
 });
 
@@ -122,7 +122,7 @@ app.post("/sendlink", [body("jid").notEmpty()], async (req, res) => {
     },
   };
 
-  BOTConnection()
+  await BOTConnection()
     .BotSendMessage(jid, templateMessage)
     .then((response) => {
       res.status(200).json({
@@ -159,7 +159,7 @@ app.post("/text-message", [body("jid").notEmpty()], async (req, res) => {
   // console.log ("created group with id: " + group.gid + JSON.stringify(group))
   // socket.sendMessage(group.id, { text: 'hello there' }) // say hello to everyone on the group
 
-  BOTConnection()
+ await  BOTConnection()
     .BotSendMessage(jid, { text: message })
     .then((response) => {
       res.status(200).json({
