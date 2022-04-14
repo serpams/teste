@@ -54,7 +54,7 @@ const BotUpdate = (socket) => {
   });
 };
 
-const BOTConnection = async () => {
+const BOTConnection = async (fn,jid,msg) => {
   const { version } = await fetchLatestBaileysVersion();
   if (!existsSync(AuthPath)) {
     mkdirSync(AuthPath, { recursive: true });
@@ -74,15 +74,19 @@ const BOTConnection = async () => {
   BotUpdate(socket.ev);
   socket.ev.on("creds.update", saveState);
 
-  const BotSendMessage = async (jid, msg) => {
-    await socket.presenceSubscribe(jid);
-    await delay(2000);
-    await socket.sendPresenceUpdate("composing", jid);
-    await delay(2000);
-    await socket.sendPresenceUpdate("paused", jid);
-    await delay(1000);
-    return await socket.sendMessage(jid, msg);
-  };
+  if(fn == 'msg'){
+
+   await socket.presenceSubscribe(jid);
+   await delay(2500);
+   await socket.sendPresenceUpdate("composing", jid);
+   await delay(2500);
+   await socket.sendPresenceUpdate("paused", jid);
+   return await socket.sendMessage(jid, msg);
+
+  }
+//   const BotSendMessage = async (jid, msg) => {
+   
+//   };
 };
 app.get('/connectbot', async (req, res) => {
   await BOTConnection();
@@ -122,6 +126,8 @@ app.post("/sendlink", [body("jid").notEmpty()], async (req, res) => {
     },
   };
 
+// use BotSendMessage(jid, templateMessage);
+ 
   const result = await  BOTConnection()
   await result.BotSendMessage(jid, templateMessage)
     .then((response) => {
@@ -151,28 +157,28 @@ app.post("/text-message", [body("jid").notEmpty()], async (req, res) => {
 
   const jid = req.body.jid.toString();
   const message = req.body.message;
-  // const metadata = await socket.groupMetadata("La8QJc2n55IGP2GtHD2szA@g.us")
-  // console.log(metadata)
-  // const metadata =await socket.groupMetadata("La8QJc2n55IGP2GtHD2szA@g.us")
-  // console.log(metadata.id + ", title: " + metadata.subject + ", description: " + metadata.desc)
-  // const group = await socket.groupCreate("My Fab Group", [jid ,'5521977085506@s.whatsapp.net' ])
-  // console.log ("created group with id: " + group.gid + JSON.stringify(group))
-  // socket.sendMessage(group.id, { text: 'hello there' }) // say hello to everyone on the group
 
- const result = await  BOTConnection()
- await result.BotSendMessage(jid, { text: message })
-    .then((response) => {
+  const result = await BOTConnection('msg',jid,message);
+  if(result.error == ''){
       res.status(200).json({
-        status: true,
-        response: response,
+         status: true,
+         response: result,
       });
-    })
-    .catch((err) => {
-      res.status(500).json({
-        status: false,
-        response: err,
-      });
-    });
+  }
+  
+//  await result.BotSendMessage(jid, { text: message })
+//     .then((response) => {
+//       res.status(200).json({
+//         status: true,
+//         response: response,
+//       });
+//     })
+//     .catch((err) => {
+//       res.status(500).json({
+//         status: false,
+//         response: err,
+//       });
+//     });
 });
 
 server.listen(port, function () {
