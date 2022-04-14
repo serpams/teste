@@ -122,8 +122,8 @@ app.post("/sendlink", [body("jid").notEmpty()], async (req, res) => {
     },
   };
 
-  await BOTConnection()
-    .BotSendMessage(jid, templateMessage)
+  const result = await  BOTConnection()
+  await result.BotSendMessage(jid, templateMessage)
     .then((response) => {
       res.status(200).json({
         status: true,
@@ -159,8 +159,8 @@ app.post("/text-message", [body("jid").notEmpty()], async (req, res) => {
   // console.log ("created group with id: " + group.gid + JSON.stringify(group))
   // socket.sendMessage(group.id, { text: 'hello there' }) // say hello to everyone on the group
 
- await  BOTConnection()
-    .BotSendMessage(jid, { text: message })
+ const result = await  BOTConnection()
+ await result.BotSendMessage(jid, { text: message })
     .then((response) => {
       res.status(200).json({
         status: true,
